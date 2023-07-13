@@ -91,6 +91,20 @@ class User {
   User.fromJson(Map<String, dynamic> json)
       : id = json[UserFields.id] as int?,
         gender = json[UserFields.gender] as String,
+        username = json[UserFields.username] as String,
+        firstName = json[UserFields.firstName] as String,
+        lastName = json[UserFields.lastName] as String,
+        email = json[UserFields.email] as String,
+        phone = json[UserFields.phone] as String,
+        registerDate = DateTime.parse(json[UserFields.registerDate] as String),
+        city = json[UserFields.city] as String,
+        country = json[UserFields.country] as String,
+        dateOfBirth = DateTime.parse(json[UserFields.dateOfBirth] as String),
+        picture = json[UserFields.picture] as String;
+
+  User.fromAPIJson(Map<String, dynamic> json)
+      : id = json[UserFields.id] as int?,
+        gender = json[UserFields.gender] as String,
         username = json["login"]![UserFields.username] as String,
         firstName = json["name"]!["first"] as String,
         lastName = json["name"]!["last"] as String,

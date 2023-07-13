@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:randomuser/models/api/api_status.dart';
 import 'package:randomuser/models/services/base_service.dart';
 import 'package:http/http.dart' as http;
@@ -25,5 +27,17 @@ class MainService extends BaseService {
     }
 
     return responseJson;
+  }
+
+  Future<bool> checkInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      return false;
+    }
+    return false;
   }
 }
