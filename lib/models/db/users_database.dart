@@ -24,7 +24,7 @@ class UserDatabase {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 3,
       onCreate: _createDB,
     );
   }

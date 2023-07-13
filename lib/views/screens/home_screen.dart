@@ -32,6 +32,34 @@ class _HomeScreenState extends State<HomeScreen>
     MainViewModel mainViewModel = context.watch<MainViewModel>();
 
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          PopupMenuButton(
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  child: const Text("Profil aléatoire"),
+                  onTap: () async {
+                    await mainViewModel.getRandomUser();
+                  },
+                ),
+                PopupMenuItem(
+                  child: const Text("Utilisateurs aléatoires"),
+                  onTap: () async {
+                    await mainViewModel.fetchUsersFromAPI();
+                  },
+                ),
+                PopupMenuItem(
+                  child: const Text("Effacer la BD"),
+                  onTap: () async {
+                    await mainViewModel.clearDB();
+                  },
+                ),
+              ];
+            },
+          )
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -43,80 +71,96 @@ class _HomeScreenState extends State<HomeScreen>
         },
         child: const Icon(Icons.search_rounded),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-
-              // profile picture
-              const CircleAvatar(
-                radius: 50,
-                child: Icon(
-                  Icons.person,
-                  size: 50,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              // personal info
-              const Text(
-                "@john_doe",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const Text(
-                "(John Doe)",
-                style: TextStyle(fontWeight: FontWeight.w300),
-              ),
-
-              // following and followers tabs
-              SizedBox(
-                height: 50,
-                child: TabBar(
-                  unselectedLabelColor: Colors.black,
-                  labelColor: Colors.deepPurple,
-                  tabs: const [
-                    Tab(
-                      text: '435 Abonnements',
-                    ),
-                    Tab(
-                      text: '1950 Abonnés',
-                    )
-                  ],
-                  controller: _tabController,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                ),
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height - 270,
-                child: TabBarView(
-                  controller: _tabController,
+      body: Column(
+        children: [
+          mainViewModel.profileLoading
+              ? const SizedBox(
+                  height: 161,
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : // profile picture
+              Column(
                   children: [
-                    SingleChildScrollView(
-                      child: Column(
+                    const CircleAvatar(
+                      radius: 50,
+                      child: Icon(
+                        Icons.person,
+                        size: 50,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // personal info
+                    Text(
+                      "@${mainViewModel.profile.username}",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      "(${mainViewModel.profile.firstName} ${mainViewModel.profile.lastName})",
+                      style: const TextStyle(fontWeight: FontWeight.w300),
+                    ),
+                  ],
+                ),
+
+          // following and followers tabs
+          mainViewModel.loading
+              ? SizedBox(
+                  height: MediaQuery.of(context).size.height - 260,
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : Column(
+                  children: [
+                    SizedBox(
+                      height: 50,
+                      child: TabBar(
+                        unselectedLabelColor: Colors.black,
+                        labelColor: Colors.deepPurple,
+                        tabs: const [
+                          Tab(
+                            text: '435 Abonnements',
+                          ),
+                          Tab(
+                            text: '1950 Abonnés',
+                          )
+                        ],
+                        controller: _tabController,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height - 310,
+                      child: TabBarView(
+                        controller: _tabController,
                         children: [
-                          ...mainViewModel.users.map(
-                            (e) => UserCard(
-                              user: e,
+                          SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                ...mainViewModel.users.map(
+                                  (e) => UserCard(
+                                    user: e,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 70,
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(
-                            height: 70,
-                          ),
+                          const Text('Person'),
                         ],
                       ),
                     ),
-                    const Text('Person'),
                   ],
                 ),
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }

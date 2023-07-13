@@ -5,12 +5,29 @@ import 'package:randomuser/models/api/api_status.dart';
 import 'package:randomuser/models/db/users_database.dart';
 import 'package:randomuser/models/schemas/user.dart';
 import 'package:randomuser/models/services/main_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainViewModel with ChangeNotifier {
   bool loading = false;
+  bool isSearching = false;
+  bool profileLoading = false;
 
   UserDatabase db = UserDatabase.instance;
 
+  // user profile
+  User profile = User(
+    firstName: '',
+    lastName: '',
+    username: '',
+    email: '',
+    gender: '',
+    phone: '',
+    registerDate: DateTime.now(),
+    city: '',
+    country: '',
+    dateOfBirth: DateTime.now(),
+    picture: '',
+  );
   List<User> users = [];
   List<User> filteredUsers = [];
 
@@ -20,6 +37,7 @@ class MainViewModel with ChangeNotifier {
 
   Future init() async {
     // clearDB();
+    await getUserProfile();
     await fetchUsers();
     filteredUsers = users;
   }
@@ -30,6 +48,7 @@ class MainViewModel with ChangeNotifier {
     notifyListeners();
 
     await db.deleteAll();
+    users.clear();
 
     loading = false;
     notifyListeners();
@@ -43,18 +62,12 @@ class MainViewModel with ChangeNotifier {
 
   // fetch users from the database or the API
   Future fetchUsers() async {
-    loading = true;
-    notifyListeners();
-
     final hasInternetConnection = await this.hasInternetConnection();
 
     if (!hasInternetConnection) {
       await fetchUsersFromDB();
     }
     await fetchUsersFromAPI();
-
-    loading = false;
-    notifyListeners();
   }
 
   // fetch users from the database
@@ -65,11 +78,12 @@ class MainViewModel with ChangeNotifier {
 
   // fetch users from the API
   Future fetchUsersFromAPI() async {
+    loading = true;
+    notifyListeners();
+
     final response = await MainService().getUsersFromAPI();
 
     if (response is Success) {
-      print(response.response);
-
       final data =
           json.decode(response.response as String) as Map<String, dynamic>;
 
@@ -84,11 +98,61 @@ class MainViewModel with ChangeNotifier {
     } else {
       print((response as Failure).errorResponse);
     }
+
+    loading = false;
+    notifyListeners();
+  }
+
+  // get a random user from the database or the API
+  Future getRandomUser() async {
+    profileLoading = true;
+    notifyListeners();
+
+    final response = await MainService().getUsersFromAPI(limit: 1);
+
+    if (response is Success) {
+      final data =
+          json.decode(response.response as String) as Map<String, dynamic>;
+
+      profile = User.fromAPIJson(data['results'][0]);
+      await saveUserProfile(profile);
+    } else {
+      print((response as Failure).errorResponse);
+    }
+
+    profileLoading = false;
+    notifyListeners();
+  }
+
+  // get user profile from the shared preferences
+  Future getUserProfile() async {
+    profileLoading = true;
+    notifyListeners();
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? profileString = prefs.getString('profile');
+
+    if (profileString != null) {
+      profile =
+          User.fromJson(json.decode(profileString) as Map<String, dynamic>);
+    } else {
+      await getRandomUser();
+    }
+
+    profileLoading = false;
+    notifyListeners();
+  }
+
+  Future saveUserProfile(User user) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('profile', json.encode(profile.toJson()));
+
+    profile = user;
   }
 
   // search users
   Future searchUsers(String query) async {
-    loading = true;
+    isSearching = true;
     notifyListeners();
 
     filteredUsers = users;
@@ -102,7 +166,7 @@ class MainViewModel with ChangeNotifier {
           .toList();
     }
 
-    loading = false;
+    isSearching = false;
     notifyListeners();
   }
 }
