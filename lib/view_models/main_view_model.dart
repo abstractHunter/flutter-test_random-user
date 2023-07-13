@@ -12,13 +12,17 @@ class MainViewModel with ChangeNotifier {
   UserDatabase db = UserDatabase.instance;
 
   List<User> users = [];
+  List<User> filteredUsers = [];
 
   MainViewModel() {
-    // clearDB();
-    fetchUsers();
+    init();
   }
 
-  // check if the device is connected to the internet
+  Future init() async {
+    // clearDB();
+    await fetchUsers();
+    filteredUsers = users;
+  }
 
   // clear the database
   Future clearDB() async {
@@ -31,9 +35,9 @@ class MainViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // check if the device has internet connection
   Future hasInternetConnection() async {
     final internetConnection = await MainService().checkInternetConnection();
-
     return internetConnection;
   }
 
@@ -80,5 +84,25 @@ class MainViewModel with ChangeNotifier {
     } else {
       print((response as Failure).errorResponse);
     }
+  }
+
+  // search users
+  Future searchUsers(String query) async {
+    loading = true;
+    notifyListeners();
+
+    filteredUsers = users;
+
+    if (query.isNotEmpty) {
+      filteredUsers = users
+          .where((user) =>
+              user.firstName.toLowerCase().contains(query.toLowerCase()) ||
+              user.lastName.toLowerCase().contains(query.toLowerCase()) ||
+              user.username.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+
+    loading = false;
+    notifyListeners();
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:randomuser/view_models/main_view_model.dart';
-import 'package:randomuser/views/home_screen.dart';
+import 'package:randomuser/views/screens/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
