@@ -5,7 +5,7 @@ import 'package:randomuser/models/services/base_service.dart';
 import 'package:http/http.dart' as http;
 
 class MainService extends BaseService {
-  Future getUsersFromAPI({int limit = 20}) async {
+  Future getUsersFromAPI({int limit = 100}) async {
     String url = '$baseUrl/?results=$limit';
     dynamic responseJson;
 

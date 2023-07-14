@@ -98,11 +98,30 @@ class _HomeScreenState extends State<HomeScreen>
               : // profile picture
               Column(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 50,
-                      child: Icon(
-                        Icons.person,
-                        size: 50,
+                      child: CircleAvatar(
+                        radius: 50 - 2,
+                        backgroundColor: Colors.deepPurple[300],
+                        child: ClipOval(
+                          child: Image.network(
+                            mainViewModel.profile.picture,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.deepPurple[300],
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.error_outline,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       ),
                     ),
 
@@ -151,8 +170,11 @@ class _HomeScreenState extends State<HomeScreen>
                         indicatorSize: TabBarIndicatorSize.tab,
                       ),
                     ),
+                    const SizedBox(
+                      height: 8,
+                    ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height - 310,
+                      height: MediaQuery.of(context).size.height - 315,
                       child: TabBarView(
                         controller: _tabController,
                         children: [
