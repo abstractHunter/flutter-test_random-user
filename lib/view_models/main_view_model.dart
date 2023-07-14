@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:randomuser/models/api/api_status.dart';
@@ -28,7 +29,10 @@ class MainViewModel with ChangeNotifier {
     dateOfBirth: DateTime.now(),
     picture: '',
   );
+
   List<User> users = [];
+  List<User> following = [];
+  List<User> followers = [];
   List<User> filteredUsers = [];
 
   MainViewModel() {
@@ -72,8 +76,16 @@ class MainViewModel with ChangeNotifier {
 
   // fetch users from the database
   Future fetchUsersFromDB() async {
+    loading = true;
+    notifyListeners();
+
     users.clear(); // ensure that the list is empty before adding new users
     users = await db.getAllUsers();
+
+    dispatchUsers();
+
+    loading = false;
+    notifyListeners();
   }
 
   // fetch users from the API
@@ -95,8 +107,43 @@ class MainViewModel with ChangeNotifier {
       }
 
       users.sort((a, b) => a.username.compareTo(b.firstName));
+
+      dispatchUsers();
     } else {
       print((response as Failure).errorResponse);
+    }
+
+    loading = false;
+    notifyListeners();
+  }
+
+  // dispatch users to the following and followers lists
+  Future dispatchUsers() async {
+    loading = true;
+    notifyListeners();
+
+    following.clear();
+    followers.clear();
+
+    // get a random number between 1 and 100 for the number of following and followers
+    final followingCount = 1 + Random().nextInt(100);
+    final followersCount = 1 + Random().nextInt(100);
+
+    // get a random indexes for the following and followers
+    final followingIndexes = List.generate(followingCount, (index) {
+      return Random().nextInt(users.length);
+    });
+    final followersIndexes = List.generate(followersCount, (index) {
+      return Random().nextInt(users.length);
+    });
+
+    // get the following and followers from the users list
+    for (final index in followingIndexes) {
+      following.add(users[index]);
+    }
+
+    for (final index in followersIndexes) {
+      followers.add(users[index]);
     }
 
     loading = false;

@@ -138,12 +138,13 @@ class _HomeScreenState extends State<HomeScreen>
                       child: TabBar(
                         unselectedLabelColor: Colors.black,
                         labelColor: Colors.deepPurple,
-                        tabs: const [
+                        tabs: [
                           Tab(
-                            text: '435 Abonnements',
+                            text:
+                                '${mainViewModel.following.length} Abonnements',
                           ),
                           Tab(
-                            text: '1950 Abonnés',
+                            text: '${mainViewModel.followers.length} Abonnés',
                           )
                         ],
                         controller: _tabController,
@@ -158,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen>
                           SingleChildScrollView(
                             child: Column(
                               children: [
-                                ...mainViewModel.users.map(
+                                ...mainViewModel.following.map(
                                   (e) => UserCard(
                                     user: e,
                                   ),
@@ -169,7 +170,20 @@ class _HomeScreenState extends State<HomeScreen>
                               ],
                             ),
                           ),
-                          const Text('Person'),
+                          SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                ...mainViewModel.followers.map(
+                                  (e) => UserCard(
+                                    user: e,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  height: 70,
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
