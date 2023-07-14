@@ -31,18 +31,18 @@ class UserFields {
 }
 
 class User {
-  final int? id;
-  final String username;
-  final String gender;
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String phone;
-  final DateTime registerDate;
-  final String city;
-  final String country;
-  final DateTime dateOfBirth;
-  final String picture;
+  int? id;
+  String username;
+  String gender;
+  String firstName;
+  String lastName;
+  String email;
+  String phone;
+  DateTime registerDate;
+  String city;
+  String country;
+  DateTime dateOfBirth;
+  String picture;
 
   User({
     this.id,

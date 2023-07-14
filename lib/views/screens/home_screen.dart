@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:randomuser/view_models/main_view_model.dart';
+import 'package:randomuser/views/screens/profile_update_screen.dart';
 import 'package:randomuser/views/screens/search_screen.dart';
 import 'package:randomuser/views/widgets/user_card.dart';
 
@@ -43,6 +44,10 @@ class _HomeScreenState extends State<HomeScreen>
                     await mainViewModel.getRandomUser();
                   },
                 ),
+                const PopupMenuItem(
+                  value: 2,
+                  child: Text("Mettre à jour le profil"),
+                ),
                 PopupMenuItem(
                   child: const Text("Utilisateurs aléatoires"),
                   onTap: () async {
@@ -56,6 +61,16 @@ class _HomeScreenState extends State<HomeScreen>
                   },
                 ),
               ];
+            },
+            onSelected: (value) {
+              if (value == 2) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileUpdateScreen(),
+                  ),
+                );
+              }
             },
           )
         ],
